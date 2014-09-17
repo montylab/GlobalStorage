@@ -1,0 +1,27 @@
+<script>
+window.onmessage = function(e) {
+    var payload = JSON.parse(e.data);
+	var data;
+	var status;
+
+    switch(payload.method) {
+		case 'set':
+			localStorage.setItem(payload.key, payload.data);
+			status = (localStorage.getItem(payload.key) == JSON.stringify(payload.data))?'success':'fail';
+			data = JSON.stringify({item: {'status': status}, 'callbackId': JSON.parse(e.data).callbackId});
+            window.parent.postMessage(data, "*");
+			break;
+        case 'get':
+            var item = JSON.parse(localStorage.getItem(payload.key)) || {};
+			data = JSON.stringify({item: item, 'callbackId': JSON.parse(e.data).callbackId});
+            window.parent.postMessage(data, "*");
+            break;
+        case 'remove':
+            localStorage.removeItem(payload.key);
+			status = (!localStorage.getItem(payload.key))?'success':'fail';
+			data = JSON.stringify({item: {'status': status}, 'callbackId': JSON.parse(e.data).callbackId});
+            window.parent.postMessage(data, "*");
+            break;
+    }
+};
+</script>
